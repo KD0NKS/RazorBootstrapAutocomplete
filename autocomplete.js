@@ -1,4 +1,13 @@
-$.fn.autocomplete = function(options) {
+/**
+ * source
+ * min
+ * class
+ * displayValue
+ * selectValue
+ * target
+ * ajax calls: must set async to false!
+ */
+$.fn.autocomplete = function (options) {
     function guidGenerator() {
         var S4 = function () {
             return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
@@ -14,7 +23,7 @@ $.fn.autocomplete = function(options) {
     if(IsNullOrEmpty(options) || IsNullOrEmpty(options.source)) {
         throw "Source must be defined for autocomplete element."
     }
-        
+
     if(IsNullOrEmpty(options.min)) {
         options.min = 1
     }
@@ -34,15 +43,16 @@ $.fn.autocomplete = function(options) {
     let menuId = 'dd-menu-' + guidGenerator()
 
     this.attr({
-            'data-toggle': 'dropdown'
-            , 'haspopup': 'true'
-            , 'aria-expanded': 'false'
-            })
+        'data-toggle': 'dropdown'
+        , 'haspopup': 'true'
+        , 'aria-expanded': 'false'
+    })
 
     this.after(`<ul id="${menuId}" class="${options.class}"></ul>`)
-    
+
     // todo look at bind - https://stackoverflow.com/questions/1948332/detect-all-changes-to-a-input-type-text-immediately-using-jquery
     // todo look at old val compare - https://stackoverflow.com/questions/1948332/detect-all-changes-to-a-input-type-text-immediately-using-jquery
+    // todo support user defined filters on source array
     $(this).on('keyup', (e) => {
         // add exceptions for up, down, enter these will be used for selection instead
 
@@ -53,13 +63,22 @@ $.fn.autocomplete = function(options) {
 
         if(!IsNullOrEmpty(val) && val.length >= options.min) {
             let filtered = []
+            let source = []
 
-            if(!IsNullOrEmpty(options.displayValue)) {
-                filtered = options.source.filter(item => item[options.displayValue].indexOf(val) > -1)
+            if(typeof options.source === "function") {
+                $(options.source(function(retVal) {
+                    source = retVal
+                }))
             } else {
-                filtered = options.source.filter(item => item.indexOf(val) > -1)
+                source = options.source
             }
-                
+            
+            if(!IsNullOrEmpty(options.displayValue)) {
+                filtered = source.filter(item => item[options.displayValue].toUpperCase().indexOf(val.toUpperCase()) > -1)
+            } else {
+                filtered = source.filter(item => item.toUpperCase().indexOf(val.toUpperCase()) > -1)
+            }
+
             if(filtered.length > 0) {
                 let menu = ''
 
