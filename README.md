@@ -5,7 +5,8 @@ Autocomplete for MVC/Razor using jQuery and Bootstrap 3
 * Yep!
 
 # Example
-`<div class="dropdown">
+``` javascript
+<div class="dropdown">
     <input type="text" id="autoCompleteTest" />
 </div>
 
@@ -17,4 +18,5 @@ $("#autoCompleteTest").autocomplete({
         , displayValue: 'name'
         , selectValue: 'value'
         , target: '#autoCompleteSelectedValue'
-        });`
+        });
+```
