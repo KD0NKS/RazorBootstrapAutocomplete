@@ -20,6 +20,7 @@ $.fn.autocomplete = function (options) {
         return opt === null || opt === undefined || opt === ''
     }
 
+    // defaults
     if(IsNullOrEmpty(options) || IsNullOrEmpty(options.source)) {
         throw "Source must be defined for autocomplete element."
     }
@@ -40,6 +41,7 @@ $.fn.autocomplete = function (options) {
         }
     }
 
+    // each loop here
     let menuId = 'dd-menu-' + guidGenerator()
 
     this.attr({
@@ -53,6 +55,7 @@ $.fn.autocomplete = function (options) {
     // todo look at bind - https://stackoverflow.com/questions/1948332/detect-all-changes-to-a-input-type-text-immediately-using-jquery
     // todo look at old val compare - https://stackoverflow.com/questions/1948332/detect-all-changes-to-a-input-type-text-immediately-using-jquery
     // todo support user defined filters on source array
+    // todo typing delaylook
     $(this).on('keyup', (e) => {
         // add exceptions for up, down, enter these will be used for selection instead
 
@@ -66,9 +69,11 @@ $.fn.autocomplete = function (options) {
             let source = []
 
             if(typeof options.source === "function") {
-                $(options.source(function(retVal) {
-                    source = retVal
-                }))
+                $(options.source(
+                    function(retVal) {
+                        source = retVal
+                    }
+                    , e.target.value))
             } else {
                 source = options.source
             }
