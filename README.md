@@ -8,7 +8,7 @@ Autocomplete for MVC/Razor using jQuery and Bootstrap 3
 * look at bindings - https://stackoverflow.com/questions/1948332/detect-all-changes-to-a-input-type-text-immediately-using-jquery
 * look at old val compare - https://stackoverflow.com/questions/1948332/detect-all-changes-to-a-input-type-text-immediately-using-jquery
 * support user defined filters on source array
-* typing delaylook, cancellation of ajax call, etc
+* typing delay, cancellation of ajax call, etc
 * add exceptions for up, down, enter these will be used for selection instead
 * save old value, if a new one is not selected on blur, set the input display value back to selected display value set the list back to the selected list item
     * or if input is changed and the target has a value, clear the value of the target
