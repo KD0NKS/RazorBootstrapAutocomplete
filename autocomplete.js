@@ -40,23 +40,24 @@ $.fn.autocomplete = function (options) {
             options.displayValue = options.selectValue
         }
     }
-    
+
     return this.each(function () {
         let menuId = 'dd-menu-' + guidGenerator()
         let input = $(this)
-
+        let menuOptions = []
+        
         input.attr({
-            'data-toggle': 'dropdown'
-            , 'haspopup': 'true'
+            'haspopup': 'true'
             , 'aria-expanded': 'false'
         })
 
         input.after(`<ul id="${menuId}" class="${options.class}"></ul>`)
-
+        
         // todo look at bind - https://stackoverflow.com/questions/1948332/detect-all-changes-to-a-input-type-text-immediately-using-jquery
         // todo look at old val compare - https://stackoverflow.com/questions/1948332/detect-all-changes-to-a-input-type-text-immediately-using-jquery
         // todo support user defined filters on source array
         // todo typing delaylook
+        // todo grep instead of index of?
 
         input.on('keyup', (e) => {
             // add exceptions for up, down, enter these will be used for selection instead
@@ -67,12 +68,11 @@ $.fn.autocomplete = function (options) {
             let val = e.target.value
 
             if(!IsNullOrEmpty(val) && val.length >= options.min) {
-                let filtered = []
                 let source = []
 
                 if(typeof options.source === "function") {
                     $(options.source(
-                        function(retVal) {
+                        function (retVal) {
                             source = retVal
                         }
                         , e.target.value))
@@ -81,15 +81,15 @@ $.fn.autocomplete = function (options) {
                 }
 
                 if(!IsNullOrEmpty(options.displayValue)) {
-                    filtered = source.filter(item => item[options.displayValue].toUpperCase().indexOf(val.toUpperCase()) > -1)
+                    menuOptions = source.filter(item => item[options.displayValue].toUpperCase().indexOf(val.toUpperCase()) > -1)
                 } else {
-                    filtered = source.filter(item => item.toUpperCase().indexOf(val.toUpperCase()) > -1)
+                    menuOptions = source.filter(item => item.toUpperCase().indexOf(val.toUpperCase()) > -1)
                 }
 
-                if(filtered.length > 0) {
+                if(menuOptions.length > 0) { // populate the drop down menu with filtered options
                     let menu = ''
 
-                    filtered.forEach((item) => {
+                    menuOptions.forEach((item) => {
                         menu += `<li>`
                         if(!IsNullOrEmpty(options.displayValue)) {
                             menu += `<a href="#" data-display="${item[options.displayValue]}" data-value="${item[options.selectValue]}">${item[options.displayValue]}</a>`
@@ -101,21 +101,39 @@ $.fn.autocomplete = function (options) {
 
                     $(`#${menuId}`).html(menu)
 
-                    $(`#${menuId} li a`).on('click', (selected) => {
+                    $(`#${menuId} li a`).on('mousedown', (selected) => {
                         input.val(selected.target.getAttribute('data-display'))
-                        
+
                         if(options.target && typeof options.target === "function") {
                             options.target(input).val(selected.target.getAttribute('data-value'))
                         }
 
                         $(`#${menuId}`).html(selected.target.parentElement)
                     })
-                } else {
+
+                    $(`#${menuId}`).show()
+                } else { // clear the drop down menu
                     $(`#${menuId}`).html('')
+                    $(`#${menuId}`).hide()
+                    menuOptions = []
                 }
             } else {
                 $(`#${menuId}`).html('')
+                $(`#${menuId}`).hide()
+                menuOptions = []
             }
+        })
+
+        input.on('focus', () => {
+            if(menuOptions.length > 0) {
+                $(`#${menuId}`).show()
+            } else {
+                $(`#${menuId}`).hide()
+            }
+        })
+
+        input.on('blur', (e) => {
+            $(`#${menuId}`).hide()
         })
     })
 }
